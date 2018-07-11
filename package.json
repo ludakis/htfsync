@@ -1,0 +1,25 @@
+{
+  "name": "HTF_FileUploader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nodeExcelTest.js",
+  "engines": {
+    "node": "8.11.3"
+  },
+  "dependencies": {
+    "express": "^4.13.3",
+    "multer": "^1.1.0",
+    "should": "^7.1.1",
+    "supertest": "^1.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "LUDAKIS",
+  "license": "ISC"
+}

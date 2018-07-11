@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>HTF Inventaire Dashboard</title>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
+    <style media="screen">
+      body {
+        background-color: #0063c7;
+      }
+      .container {
+        background-image: url(logoligablo.png);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 150px 150px;
+      }
+      .form-box {
+        width: 400px;
+        height: 220px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px #000;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #ff9900;
+        padding: 50px;
+      }
+
+      .palette-ln h3 {
+        color: lightgray;
+      }
+      .details {
+        background-color: #fff;
+        margin-top: 64px;
+        border-radius: 3px;
+        height: 246px;
+        margin-left: 20px;
+      }
+      .details li {
+        list-style: none;
+      }
+      .details b {
+        text-transform: uppercase;
+      }
+      .alert-row {
+        padding: 5px;
+        /* background-color: #000; */
+        border-radius: 3px;
+        border-bottom: thin solid #aaa;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar navbar-inverse">
+      <ul class="nav navbar-nav">
+        <li class="active"> <a href="#">Tableau de board</a> </li>
+        <!-- <li> <a href="#">Fichiers</a> </li>
+        <li> <a href="#">Paramètres</a> </li> -->
+      </ul>
+      <form class="navbar-form pull-right">
+        <input type="text" style="width:150px" class="input-sm form-control" placeholder="Recherche">
+        <button type="submit" class="btn btn-primary btn-sm" disabled>
+          <span class="glyphicon glyphicon-eye-open"></span> Chercher</button>
+      </form>
+      </nav>
+
+      <div class="row palette-ln">
+        <div class="col-lg-5">
+          <h3>Fichiers envoyés au serveur
+            <span class="btn btn-info add-file" data-toggle="tooltip" title="ajouter un fichier d'inventaire">+</span> </h3>
+          <div class="list-group ls">
+            </div>
+          </div>
+          <div class="col-lg-5 details">
+            <h3>Détails du fichier</h3>
+            <ul>
+              <li><b>Nom du fichier: </b> <span class="badge">...</span> </li>
+              <li><b>Total articles: </b> <span class="badge">...</span> </li>
+
+            </ol>
+          </div>
+          <div class="col-lg-3">
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript">
+    $('.add-file').on('click', function () {
+      window.location.href = 'http://localhost:3000'
+    })
+    $('.add-file').tooltip({placement:'right'})
+    var serverUrl = "http://localhost:3000/";
+    $('input[type="file"]').on('change', function () {
+      if (document.querySelector('[type="file"]').files.length > 0) {
+        if (this.files[0].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+          console.log(this.files[0]);
+          $('[type="submit"]').show();
+        } else {
+          $('[type="submit"]').hide();
+        }
+      }else {
+        $('[type="submit"]').hide();
+      }
+    })
+
+    $.ajax({
+      url: serverUrl + 'api/files',
+      type: 'POST',
+      //dataType: 'default: Intelligent Guess (Other values: xml, json, script, or html)',
+      data: "flag=get-file-list",
+      success: function (rep) {
+        try {
+          var tabIn = JSON.parse(rep)
+          var tabOut = []
+          var html = ""
+          for (var i in tabIn) {
+            tabOut.push(tabIn[i].match(/fichier-inventaire-[0-9]+-*[0-9a-z]*.xlsx/)[0])
+          }
+          //console.log(tabOut);
+          for (var j in tabOut) {
+            html += '<a href="#" class="list-group-item">'+tabOut[j]
+            html += '<span class="badge">'+moment.unix(tabOut[j].match(/[0-9]+/)).format('lll')+'</span>'
+            html += '<span class="badge"></span></a>'
+          }
+          $('.ls').html(html)
+          $('.palette-ln').before('<div class="row"><div class="alert alert-success alert-dismissable col-lg-5">'
+          +'<button type="button" class="close" data-dismiss="alert">&times;</button>'
+          +'<strong>Bravo!</strong> Votre fichier a bien été envoyé sur le serveur ! </div></div>')
+        } catch (e) {
+          alert("échec chargement liste des fichiers!\n" + e.message)
+        }
+
+        console.log(rep);
+      },
+      error: function(err) {
+        console.log(err.message);
+      }
+    })
+
+    $('.send0').on('click', function () {
+      envoyer()
+    })
+    function envoyer() {
+      var file = $('input')[1].files[0]
+      fd = new FormData();
+      fd.append("monfichier", document.querySelector('[type="file"]').files[0]);
+      console.log(fd);
+
+
+
+    }
+
+    </script>
+  </body>
+</html>
